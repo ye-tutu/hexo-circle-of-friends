@@ -58,7 +58,7 @@ def github_issuse(friend_poor):
 def reg(info_list, user_info, source):
     # print('----')
     for item in info_list:
-        reg = re.compile('(?<=' + item + ': ).*')
+        reg = re.compile(f'(?<={item}: ).*')
         result = re.findall(reg, str(source))
         result = result[0].replace('\r', '')
         # print(result)
@@ -68,7 +68,7 @@ def reg(info_list, user_info, source):
 def reg_volantis(info_list, user_info, source):
     # print('----')
     for item in info_list:
-        reg = re.compile('(?<=' + item + '": ).*')
+        reg = re.compile(f'(?<={item}' + '": ).*')
         result = re.findall(reg, str(source))
         result = result[0].replace('\r', '')
         result = result.replace('"', '')
@@ -142,8 +142,6 @@ def get_friendlink(friendpage_link, friend_poor):
     elif len(soup.find_all('a', {"class": "friend-card"})) > 0:
         main_content = soup.find_all('a', {"class": "friend-card"})
         # print('使用Volantis sites')
-    # else:
-        # print('不包含标准volantis友链！')
     for item in main_content:
         if len(item.find_all('img')) > 1:
             img = item.find_all('img')[1].get('src')
@@ -154,13 +152,8 @@ def get_friendlink(friendpage_link, friend_poor):
             name = item.find('span').text
         elif item.find('p'):
             name = item.find('p').text
-        if "#" in link:
-            pass
-        else:
-            user_info = []
-            user_info.append(name)
-            user_info.append(link)
-            user_info.append(img)
+        if "#" not in link:
+            user_info = [name, link, img]
             print('----------------------')
             try:
                 print('好友名%r' % name)
@@ -185,11 +178,11 @@ def get_last_post(user_info, post_poor):
     soup = BeautifulSoup(result, 'html.parser')
     main_content = soup.find_all('section', {"class": "post-list"})
     time_excit = soup.find_all('time')
+    error_sitmap = True
     if main_content and time_excit:
-        error_sitmap = True
         link_list = main_content[0].find_all('time')
         lasttime = datetime.datetime.strptime('1970-01-01', "%Y-%m-%d")
-        for index, item in enumerate(link_list):
+        for item in link_list:
             time = item.text
             time = time.replace("|", "")
             time = time.replace(" ", "")
@@ -200,10 +193,7 @@ def get_last_post(user_info, post_poor):
         # print('最新时间是', lasttime)
         last_post_list = main_content[0].find_all('div', {"class": "post-wrapper"})
         for item in last_post_list:
-            if item.find('time'):
-                time_created = item.find('time').text.strip()
-            else:
-                time_created = ''
+            time_created = item.find('time').text.strip() if item.find('time') else ''
             if time_created == lasttime:
                 error_sitmap = False
                 # print(lasttime)
@@ -212,7 +202,7 @@ def get_last_post(user_info, post_poor):
                 alinksplit = alink.split("/", 1)
                 stralink = alinksplit[1].strip()
                 if link[-1] != '/':
-                    link = link + '/'
+                    link = f'{link}/'
                 # print(item.find('h2', {"class": "article-title"}).text.strip().encode("gbk", 'ignore').decode('gbk', 'ignore'))
                 # print(link + stralink)
                 # print("-----------获取到匹配结果----------")
@@ -226,9 +216,6 @@ def get_last_post(user_info, post_poor):
                     'rule': "volantis"
                 }
                 post_poor.append(post_info)
-    else:
-        error_sitmap = True
-        # print('貌似不是类似volantis主题！')
     # print("-----------结束主页规则----------")
     # print('\n')
     return error_sitmap

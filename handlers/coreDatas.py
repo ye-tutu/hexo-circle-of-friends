@@ -2,7 +2,7 @@ from re import escape
 import leancloud
 import datetime
 
-today = datetime.datetime.today()
+today = datetime.datetime.now()
 time_limit = 60
 
 # 友链删库

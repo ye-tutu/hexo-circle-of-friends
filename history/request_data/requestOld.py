@@ -6,8 +6,7 @@ requests.packages.urllib3.disable_warnings()
 def load_config():
     f = open('_config.yml', 'r', encoding='utf-8')
     ystr = f.read()
-    ymllist = yaml.load(ystr, Loader=yaml.FullLoader)
-    return ymllist
+    return yaml.load(ystr, Loader=yaml.FullLoader)
 
 def get_data(link):
     """
@@ -34,5 +33,4 @@ def get_data(link):
         # print(e.__traceback__.tb_lineno)
     return result
 
-if __name__ == '__main__':
-    pass
+pass
