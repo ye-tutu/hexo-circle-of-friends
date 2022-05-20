@@ -92,8 +92,7 @@ class contentChardetMiddleware(object):
         :param encodeName: str, 获取的编码名称
         :return:
         """
-        return self.encoderDict.get("encodeName", "") \
-            if self.encoderDict.get("encodeName", "") else "utf-8"
+        return self.encoderDict.get("encodeName", "") or "utf-8"
 
 
 def get_data(link, headers=None, timeout=None, verify=False):
@@ -113,13 +112,14 @@ def get_data(link, headers=None, timeout=None, verify=False):
     # 链接解析
     urlInfo = urlparse(link)
     # 请求信息
-    timeout = config.TIMEOUT if not timeout else timeout
-    verify = config.SSL if not verify else verify
-    headers = {
+    timeout = timeout or config.TIMEOUT
+    verify = verify or config.SSL
+    headers = headers or {
         'Accept-Encoding': 'deflate',
         "Referer": f"{urlInfo.scheme}://{urlInfo.netloc}",
-        'User-Agent': ua.roll_ua()
-    } if not headers else headers
+        'User-Agent': ua.roll_ua(),
+    }
+
     # 回调
     result = "error"
     try:
@@ -129,14 +129,10 @@ def get_data(link, headers=None, timeout=None, verify=False):
         # 获取网页编码格式，并修改为request.text的解码类型
         char = contentChardetMiddleware()
         r.encoding = char.encoding_2_encoding(chardet.detect(r.content)['encoding'])
-        # # print(r.text)
-
-        # 网页请求OK或者请求得到的内容过少，判断为连接失败
         if (not r.ok) or len(r.content) < 500 or r.status_code > 400:
             raise ConnectionError
-        else:
-            result = r.text
-            return result
+        result = r.text
+        return result
 
     except Exception:
         count = 0  # 重试次数
@@ -149,9 +145,8 @@ def get_data(link, headers=None, timeout=None, verify=False):
                 r.encoding = char.encoding_2_encoding(chardet.detect(r.content)['encoding'])
                 if (not r.ok) or len(r.content) < 500 or r.status_code > 400:
                     raise ConnectionError
-                else:
-                    result = r.text
-                    return result
+                result = r.text
+                return result
             except Exception:
                 count += 1
                 # print(f"{link} 重试 {count + 1} 次 失败！")

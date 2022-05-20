@@ -66,7 +66,6 @@ class loading_configs(object):
 configs = loading_configs()
 
 if __name__ == '__main__':
-    pass
     # temp = [i if i.isupper() else None for i in dir(settings)]
     # temp = list(filter(None, temp))
 

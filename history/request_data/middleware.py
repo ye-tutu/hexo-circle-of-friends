@@ -83,5 +83,4 @@ class contentChardetMiddleware(object):
         :param encodeName: str, 获取的编码名称
         :return:
         """
-        return self.encoderDict.get("encodeName", "") \
-            if self.encoderDict.get("encodeName", "") else "utf-8"
+        return self.encoderDict.get("encodeName", "") or "utf-8"

@@ -74,11 +74,10 @@ def verification():
     # 引入leancloud验证
     if configs.DEBUG:
         leancloud.init(configs.LC_APPID, configs.LC_APPKEY)
-        friendpage_link = configs.FRIENPAGE_LINK
+        return configs.FRIENPAGE_LINK
     else:
         leancloud.init(sys.argv[1], sys.argv[2])
-        friendpage_link = sys.argv[3]
-    return friendpage_link
+        return sys.argv[3]
 
 # get friend_link
 def get_link(friendpage_link, config):
@@ -156,9 +155,8 @@ def get_post(friend_poor):
             # print('\n')
             # print(e)
             error_count += 1
-        
-        if error: error = 'true'
-        else: error = 'false'
+
+        error = 'true' if error else 'false'
         item.append(error)
         return item
 

@@ -7,8 +7,7 @@ import yaml
 def load_config():
     f = open('_config.yml', 'r', encoding='utf-8')
     ystr = f.read()
-    ymllist = yaml.load(ystr, Loader=yaml.FullLoader)
-    return ymllist
+    return yaml.load(ystr, Loader=yaml.FullLoader)
 
 
 # 文章去重

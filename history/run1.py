@@ -14,38 +14,37 @@ import yaml
 
 def main():
         def load_config():
-            f = open('_config.yml', 'r',encoding='utf-8')
-            ystr = f.read()
-            ymllist = yaml.load(ystr, Loader=yaml.FullLoader)
-            return ymllist
+                f = open('_config.yml', 'r',encoding='utf-8')
+                ystr = f.read()
+                return yaml.load(ystr, Loader=yaml.FullLoader)
 
         # 时间查找(中文、标准）
         def time_zero_plus(str):
-            if len(str) < 2:
-                str = '0' + str
-            return str
+                if len(str) < 2:
+                        str = f'0{str}'
+                return str
         def find_time(str):
-            time = ''
-            try:
-                timere = re.compile(r'[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}', re.S)
-                time = re.findall(timere, str)[0]
-                timelist = time.split('-')
-                time = timelist[0] + '-' + time_zero_plus(timelist[1]) + '-' + time_zero_plus(timelist[2])
-                # print('获得标准时间', time)
-            except:
+                time = ''
                 try:
-                    timere_ch = re.compile(r'[0-9]{4}\s*年\s*[0-9]{1,2}\s*月\s*[0-9]{1,2}\s*日', re.S)
-                    time_ch = re.findall(timere_ch, str)[0]
-                    # print('找到中文时间', time_ch)
-                    year = time_ch.split('年')[0].strip()
-                    month = time_zero_plus(time_ch.split('年')[1].split('月')[0].strip())
-                    day = time_zero_plus(time_ch.split('年')[1].split('月')[1].split('日')[0].strip())
-                    time = year + '-' + month + '-' + day
-                    # print('获得标准时间', time)
+                        timere = re.compile(r'[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}', re.S)
+                        time = re.findall(timere, str)[0]
+                        timelist = time.split('-')
+                        time = f'{timelist[0]}-{time_zero_plus(timelist[1])}-{time_zero_plus(timelist[2])}'
+                        # print('获得标准时间', time)
                 except:
-                    # print('没找到符合要求的时间')
-                    time = ''
-            return time
+                        try:
+                                timere_ch = re.compile(r'[0-9]{4}\s*年\s*[0-9]{1,2}\s*月\s*[0-9]{1,2}\s*日', re.S)
+                                time_ch = re.findall(timere_ch, str)[0]
+                                # print('找到中文时间', time_ch)
+                                year = time_ch.split('年')[0].strip()
+                                month = time_zero_plus(time_ch.split('年')[1].split('月')[0].strip())
+                                day = time_zero_plus(time_ch.split('年')[1].split('月')[1].split('日')[0].strip())
+                                time = f'{year}-{month}-{day}'
+                                    # print('获得标准时间', time)
+                        except:
+                            # print('没找到符合要求的时间')
+                            time = ''
+                return time
 
         # 文章去重
         def delete_same_article(orign_friend_postpoor):
@@ -89,13 +88,13 @@ def main():
 
         # gitee适配
         def reg(info_list, user_info, source):
-            # print('----')
-            for item in info_list:
-                reg = re.compile('(?<=' + item + ': ).*')
-                result = re.findall(reg, str(source))
-                result = result[0].replace('\r', '')
-                # print(result)
-                user_info.append(result)
+                    # print('----')
+                for item in info_list:
+                        reg = re.compile(f'(?<={item}: ).*')
+                        result = re.findall(reg, str(source))
+                        result = result[0].replace('\r', '')
+                        # print(result)
+                        user_info.append(result)
 
         # 从github获取friendlink
         def github_issuse(friend_poor):

@@ -49,12 +49,10 @@ def get_data(link):
         char = contentChardetMiddleware()
         r.encoding = char.encoding_2_encoding(chardet.detect(r.content)['encoding'])
 
-        # 网页请求OK或者请求得到的内容过少，判断为连接失败
         if (not r.ok) or len(r.content) < 500 or r.status_code > 400:
             raise ConnectionError
-        else:
-            result = r.text
-            return result
+        result = r.text
+        return result
 
     except Exception:
         count = 0  # 重试次数
@@ -67,9 +65,8 @@ def get_data(link):
                 r.encoding = char.encoding_2_encoding(chardet.detect(r.content)['encoding'])
                 if (not r.ok) or len(r.content) < 500 or r.status_code > 400:
                     raise ConnectionError
-                else:
-                    result = r.text
-                    return result
+                result = r.text
+                return result
             except Exception:
                 count += 1
                 # print(f"{link} 重试 {count + 1} 次 失败！")

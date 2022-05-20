@@ -48,7 +48,7 @@ def block_link(orign_friend_poordic, config = config.yml):
 def reg(info_list, user_info, source):
     # print('----')
     for item in info_list:
-        reg = re.compile('(?<=' + item + ': ).*')
+        reg = re.compile(f'(?<={item}: ).*')
         result = re.findall(reg, str(source))
         result = result[0].replace('\r', '')
         # print(result)
@@ -178,31 +178,30 @@ def sitmap_get(user_info, post_poor, config=config.yml):
     link = user_info[1]
     error_sitmap = False
     try:
-        result = request.get_data(link + '/sitemap.xml')
+        result = request.get_data(f'{link}/sitemap.xml')
         soup = BeautifulSoup(result, 'html.parser')
         items = soup.find_all('url')
         if len(items) == 0:
-            result = request.get_data(link + '/baidusitemap.xml')
+            result = request.get_data(f'{link}/baidusitemap.xml')
             soup = BeautifulSoup(result, 'html.parser')
             items = soup.find_all('url')
-        l = 5
         new_loc = []
         new_loc_time = []
-        if len(items) < 5: l = len(items)
+        l = min(len(items), 5)
         if l == 0:
             error_sitmap = True
             # print('该网站可能没有rss')
         else:
+            post_info = {}
             for i in range(l):
-                post_info = {}
                 item = items[i]
-                
-                # new_loc.append(url)
-                # new_loc_time.append(time)
-                # post_poor.append(post_info)
-            # print('该网站最新的{}条rss为：'.format(l), new_loc[0:5])
-            # print('该网站最新的{}个时间为：'.format(l), new_loc_time[0:5])
-            
+                            
+                            # new_loc.append(url)
+                            # new_loc_time.append(time)
+                            # post_poor.append(post_info)
+                    # print('该网站最新的{}条rss为：'.format(l), new_loc[0:5])
+                    # print('该网站最新的{}个时间为：'.format(l), new_loc_time[0:5])
+
     except Exception as e:
         # print('无法请求sitemap')
         # print(e)
@@ -220,42 +219,42 @@ def atom_get(user_info, post_poor, config=config.yml):
     link = user_info[1]
     error_atom = False
     try:
-        html = request.get_data(link + "/atom.xml")
+        html = request.get_data(f"{link}/atom.xml")
         # # print(html)
         soup = BeautifulSoup(html, 'html.parser')
         items = soup.find_all("entry")
         if len(items) == 0:
-            html = request.get_data(link + "/feed/atom")
+            html = request.get_data(f"{link}/feed/atom")
             soup = BeautifulSoup(html, 'html.parser')
             items = soup.find_all("entry")
-        l = 5
-        new_loc = []
-        new_loc_time = []
-        if len(items) < 5: l = len(items)
-
+        l = min(len(items), 5)
         if l == 0:
             error_atom = True
             # print('该网站可能没有atom')
         else:
+            new_loc = []
+            new_loc_time = []
             for i in range(l):
-                post_info = {}
                 item = items[i]
                 title = item.find("title").text
                 url = item.find("link")['href']
                 time = item.find("published").text[:10]
                 updated = item.find("updated").text[:10]
-                post_info['title'] = title
-                post_info['time'] = time
-                post_info['updated'] = updated
-                post_info['link'] = url
-                post_info['name'] = user_info[0]
-                post_info['img'] = user_info[2]
-                post_info['rule'] = "atom"
+                post_info = {
+                    'title': title,
+                    'time': time,
+                    'updated': updated,
+                    'link': url,
+                    'name': user_info[0],
+                    'img': user_info[2],
+                    'rule': "atom",
+                }
+
                 new_loc.append(url)
                 new_loc_time.append(time)
                 post_poor.append(post_info)
-            # print('该网站最新的{}条atom为：'.format(l), new_loc[0:5])
-            # print('该网站最新的{}个时间为：'.format(l), new_loc_time[0:5])
+                    # print('该网站最新的{}条atom为：'.format(l), new_loc[0:5])
+                    # print('该网站最新的{}个时间为：'.format(l), new_loc_time[0:5])
     except Exception as e:
         # print('无法请求atom')
         # print(e)
@@ -275,41 +274,42 @@ def rss2_get(user_info, post_poor, config=config.yml):
     link = user_info[1]
     error_atom = False
     try:
-        html = request.get_data(link + "/rss.xml")
+        html = request.get_data(f"{link}/rss.xml")
         soup = BeautifulSoup(html, 'html.parser')
         items = soup.find_all("item")
         if len(items) == 0:
-            html = request.get_data(link + "/rss2.xml")
+            html = request.get_data(f"{link}/rss2.xml")
             soup = BeautifulSoup(html, 'html.parser')
             items = soup.find_all("item")
-        l = 5
-        new_loc = []
-        new_loc_time = []
-        if len(items) < 5: l = len(items)
+        l = min(len(items), 5)
         if l == 0:
             error_atom = True
             # print('该网站可能没有rss')
         else:
+            new_loc = []
+            new_loc_time = []
             for i in range(l):
-                post_info = {}
                 item = items[i]
                 title = item.find("title").text
                 url = item.find("link").text
                 timedata = item.find("pubDate").text.split(" ")
                 y, m, d = int(timedata[3]), list(calendar.month_abbr).index(timedata[2]), int(timedata[1])
                 time = "{:02d}-{:02d}-{:02d}".format(y,m,d)
-                post_info['title'] = title
-                post_info['time'] = time
-                post_info['updated'] = time
-                post_info['link'] = url
-                post_info['name'] = user_info[0]
-                post_info['img'] = user_info[2]
-                post_info['rule'] = "rss2"
+                post_info = {
+                    'title': title,
+                    'time': time,
+                    'updated': time,
+                    'link': url,
+                    'name': user_info[0],
+                    'img': user_info[2],
+                    'rule': "rss2",
+                }
+
                 new_loc.append(url)
                 new_loc_time.append(time)
                 post_poor.append(post_info)
-            # print('该网站最新的{}条rss为：'.format(l), new_loc[0:5])
-            # print('该网站最新的{}个时间为：'.format(l), new_loc_time[0:5])
+                    # print('该网站最新的{}条rss为：'.format(l), new_loc[0:5])
+                    # print('该网站最新的{}个时间为：'.format(l), new_loc_time[0:5])
     except Exception as e:
         # print('无法请求rss/rss2')
         # print(e)
